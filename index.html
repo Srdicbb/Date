@@ -99,47 +99,51 @@
 
   .buttons {
     position: relative;
-    min-height: 210px;
+    min-height: 120px;
     display: grid;
     place-items: center;
   }
 
+  /* Počinje namerno sitno — manje od „Možda" — pa raste sa svakim njenim klikom. */
   .yes {
     position: relative;
     z-index: 2;
-    padding: 18px 46px;
+    padding: 11px 26px;
     border-radius: 100px;
     background: linear-gradient(168deg, #ff5c74 0%, var(--rose) 48%, var(--rose-dim) 100%);
     color: #fff;
-    font-size: 1.15rem;
+    font-size: 0.92rem;
     font-weight: 700;
     letter-spacing: 0.01em;
     box-shadow:
       inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
-      0 14px 34px rgba(240, 69, 94, 0.34),
+      0 10px 26px rgba(240, 69, 94, 0.3),
       0 3px 10px rgba(0, 0, 0, 0.4);
     transform: scale(var(--grow, 1));
-    transition: transform 0.42s cubic-bezier(0.34, 1.48, 0.5, 1), box-shadow 0.42s;
+    transition: transform 0.46s cubic-bezier(0.34, 1.48, 0.5, 1), box-shadow 0.46s;
     will-change: transform;
   }
   .yes:active { filter: brightness(1.08); }
 
+  /* Beži po celom ekranu, ne samo unutar svog okvira. */
   .maybe {
-    position: absolute;
-    z-index: 3;
-    padding: 13px 26px;
+    position: fixed;
+    z-index: 9;
+    padding: 17px 34px;
     border-radius: 100px;
-    border: 1px solid var(--line);
-    background: rgba(246, 234, 224, 0.06);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(246, 234, 224, 0.26);
+    background: rgba(246, 234, 224, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: var(--paper);
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: 1.08rem;
+    font-weight: 700;
     white-space: nowrap;
-    transition: left 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-                top 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-                opacity 0.2s;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+    transition: left 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+                top 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: left, top;
   }
 
   .counter {
@@ -581,21 +585,28 @@
 
   var yes = $("yes"), maybe = $("maybe"), box = $("buttons");
 
+  /* Skače bilo gde po ekranu, ali nikad preko „Da" dugmeta i nikad
+     izvan vidljivog dela — inače bi joj pobeglo i ne bi mogla da ga stigne. */
   function pomeriMozda() {
-    var b = box.getBoundingClientRect();
+    var IVICA = 14;
     var m = maybe.getBoundingClientRect();
-    var maxX = Math.max(0, b.width - m.width);
-    var maxY = Math.max(0, b.height - m.height);
-    var x = Math.random() * maxX;
-    var y = Math.random() * maxY;
+    var maxX = Math.max(0, innerWidth - m.width - IVICA * 2);
+    var maxY = Math.max(0, innerHeight - m.height - IVICA * 2);
 
-    // Ne dozvoli da sedne tačno preko DA dugmeta.
-    var y0 = yes.offsetTop, y1 = y0 + yes.offsetHeight;
-    if (y + m.height > y0 - 8 && y < y1 + 8) {
-      y = (y < b.height / 2) ? Math.max(0, y0 - m.height - 18) : Math.min(maxY, y1 + 18);
-    }
+    var y = yes.getBoundingClientRect();
+    var razmak = 22;
+
+    var x, t, i = 0;
+    do {
+      x = IVICA + Math.random() * maxX;
+      t = IVICA + Math.random() * maxY;
+      i++;
+    } while (i < 30 &&
+             x < y.right + razmak && x + m.width > y.left - razmak &&
+             t < y.bottom + razmak && t + m.height > y.top - razmak);
+
     maybe.style.left = Math.round(x) + "px";
-    maybe.style.top = Math.round(y) + "px";
+    maybe.style.top = Math.round(t) + "px";
   }
 
   maybe.addEventListener("click", function () {
@@ -618,6 +629,16 @@
     ["ask", "plan", "done"].forEach(function (id) {
       $(id).hidden = (id !== koji);
     });
+    // Lebdi preko celog ekrana, pa mora da nestane čim se ode dalje.
+    maybe.hidden = (koji !== "ask");
+  }
+
+  /* Na početku stoji pristojno ispod „Da", da se vide kao par — tek posle beži. */
+  function pocetnoMesto() {
+    var y = yes.getBoundingClientRect();
+    var m = maybe.getBoundingClientRect();
+    maybe.style.left = Math.round(Math.max(14, y.left + y.width / 2 - m.width / 2)) + "px";
+    maybe.style.top = Math.round(Math.min(innerHeight - m.height - 14, y.bottom + 20)) + "px";
   }
 
   /* ---------- 2. planiranje ---------- */
@@ -879,8 +900,11 @@
 
   crtajKalendar();
   osveziDugme();
-  requestAnimationFrame(pomeriMozda);
-  window.addEventListener("resize", pomeriMozda);
+  requestAnimationFrame(pocetnoMesto);
+  // Dok još nije bežalo, drži ga uz „Da"; kad pobegne, samo ga vrati u vidno polje.
+  window.addEventListener("resize", function () {
+    if (state.mozda === 0) { pocetnoMesto(); } else { pomeriMozda(); }
+  });
 })();
 </script>
 </body>
