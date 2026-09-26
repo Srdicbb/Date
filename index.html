@@ -810,20 +810,180 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
+  /* ---------- karta kao slika ---------- */
+
+  /* Crtamo kartu na platno umesto da slikamo ekran: slika je oštra,
+     fontovi su pravi i ispadne ista na svakom telefonu. */
+  function nacrtajKartu() {
+    var W = 1080, H = 1400, R = 44;
+    var c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    var x = c.getContext("2d");
+
+    var poz = x.createLinearGradient(0, 0, W, H);
+    poz.addColorStop(0, "#2d1836");
+    poz.addColorStop(0.55, "#1b1020");
+    poz.addColorStop(1, "#2a1430");
+    x.fillStyle = poz;
+    x.fillRect(0, 0, W, H);
+
+    var kx = 84, ky = 120, kw = W - kx * 2, kh = H - ky * 2;
+    var papir = x.createLinearGradient(0, ky, 0, ky + kh);
+    papir.addColorStop(0, "#f6eae0");
+    papir.addColorStop(1, "#e9d8c9");
+    x.save();
+    x.shadowColor = "rgba(0,0,0,0.55)";
+    x.shadowBlur = 60;
+    x.shadowOffsetY = 26;
+    zaobljen(x, kx, ky, kw, kh, R);
+    x.fillStyle = papir;
+    x.fill();
+    x.restore();
+
+    var sx = kx + 72;
+    var sirina = kw - 144;
+
+    x.textAlign = "center";
+    x.fillStyle = "#c02f45";
+    x.font = "700 26px 'Space Mono', monospace";
+    x.fillText(razmaknuto("KARTA ZA DEJT"), kx + kw / 2, ky + 96);
+
+    x.fillStyle = "#2a1830";
+    x.font = "700 86px Fraunces, Georgia, serif";
+    x.fillText("Dogovoreno!", kx + kw / 2, ky + 190);
+
+    var py = ky + 250;
+    x.strokeStyle = "rgba(42,24,48,0.3)";
+    x.lineWidth = 3;
+    x.setLineDash([14, 14]);
+    x.beginPath();
+    x.moveTo(kx, py);
+    x.lineTo(kx + kw, py);
+    x.stroke();
+    x.setLineDash([]);
+    x.fillStyle = "#1b1020";
+    [kx, kx + kw].forEach(function (cx) {
+      x.beginPath();
+      x.arc(cx, py, 30, 0, Math.PI * 2);
+      x.fill();
+    });
+
+    x.textAlign = "left";
+    var y = py + 112;
+    y = polje(x, "DAN", datumTekst(state.datum), sx, y, sirina, false);
+    y = polje(x, "VREME", state.vreme, sx, y, sirina, true);
+    y = polje(x, "PLAN", planTekst(), sx, y, sirina, false);
+
+    y += 18;
+    x.strokeStyle = "rgba(42,24,48,0.22)";
+    x.lineWidth = 2;
+    x.setLineDash([8, 8]);
+    x.beginPath();
+    x.moveTo(sx, y);
+    x.lineTo(sx + sirina, y);
+    x.stroke();
+    x.setLineDash([]);
+
+    y += 60;
+    x.fillStyle = "rgba(42,24,48,0.86)";
+    x.font = "400 34px Karla, sans-serif";
+    y = redovi(x, "Pokupi\u0107u te u " + pickup(state.vreme) + ".", sx, y, sirina, 50);
+    redovi(x, "Spremi se, ostalo je na meni. \u2764\ufe0f", sx, y, sirina, 50);
+
+    x.fillStyle = "rgba(42,24,48,0.34)";
+    x.font = "400 24px 'Space Mono', monospace";
+    x.textAlign = "right";
+    x.fillText("\u2116 " + String(state.mozda).padStart(2, "0") + "  B \u2665 M",
+               kx + kw - 72, ky + kh - 58);
+
+    return c;
+  }
+
+  function polje(x, naslov, vrednost, sx, y, sirina, veliko) {
+    x.fillStyle = "rgba(42,24,48,0.5)";
+    x.font = "700 24px 'Space Mono', monospace";
+    x.fillText(razmaknuto(naslov), sx, y);
+    x.fillStyle = "#2a1830";
+    x.font = veliko ? "700 54px 'Space Mono', monospace" : "700 44px Karla, sans-serif";
+    return redovi(x, vrednost, sx, y + (veliko ? 66 : 58), sirina, 56) + 34;
+  }
+
+  /* Prelama tekst da nikad ne izađe iz karte. */
+  function redovi(x, tekst, sx, y, sirina, visina) {
+    var reci = String(tekst).split(" ");
+    var red = "";
+    for (var i = 0; i < reci.length; i++) {
+      var probni = red ? red + " " + reci[i] : reci[i];
+      if (x.measureText(probni).width > sirina && red) {
+        x.fillText(red, sx, y);
+        y += visina;
+        red = reci[i];
+      } else {
+        red = probni;
+      }
+    }
+    if (red) { x.fillText(red, sx, y); y += visina; }
+    return y;
+  }
+
+  function razmaknuto(t) {
+    return t.split("").join("\u200a\u200a");
+  }
+
+  function zaobljen(x, l, t, w, h, r) {
+    x.beginPath();
+    x.moveTo(l + r, t);
+    x.arcTo(l + w, t, l + w, t + h, r);
+    x.arcTo(l + w, t + h, l, t + h, r);
+    x.arcTo(l, t + h, l, t, r);
+    x.arcTo(l, t, l + w, t, r);
+    x.closePath();
+  }
+
   $("send").addEventListener("click", function () {
-    var tekst = poruka();
-    if (navigator.share) {
-      navigator.share({ text: tekst }).then(function () {
-        $("said").textContent = "Poslato ❤️";
-      }).catch(function () { kopiraj(tekst); });
+    $("said").textContent = "Pravim sliku\u2026";
+
+    var kreni = function () {
+      nacrtajKartu().toBlob(function (blob) {
+        if (!blob) { kopiraj(poruka()); return; }
+        var ime = "dejt-" + state.datum.toISOString().slice(0, 10) + ".png";
+        var fajl = new File([blob], ime, { type: "image/png" });
+
+        if (navigator.canShare && navigator.canShare({ files: [fajl] })) {
+          navigator.share({ files: [fajl], text: poruka() })
+            .then(function () { $("said").textContent = "Poslato \u2764\ufe0f"; })
+            .catch(function (e) {
+              if (e && e.name === "AbortError") { $("said").textContent = ""; }
+              else { skini(blob, ime); }
+            });
+        } else {
+          skini(blob, ime);
+        }
+      }, "image/png");
+    };
+
+    // Bez učitanih fontova karta ispadne pogrešnim slovima.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(kreni).catch(kreni);
     } else {
-      kopiraj(tekst);
+      kreni();
     }
   });
 
+  function skini(blob, ime) {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = ime;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    $("said").textContent = "Slika je sa\u010duvana \u2014 po\u0161alji mu je \u2764\ufe0f";
+  }
+
   function kopiraj(tekst) {
     var gotovo = function () {
-      $("said").textContent = "Prekopirano — nalepi mu u poruku ❤️";
+      $("said").textContent = "Prekopirano \u2014 nalepi mu u poruku \u2764\ufe0f";
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(tekst).then(gotovo).catch(rucno);
@@ -838,7 +998,7 @@
       document.body.appendChild(ta);
       ta.select();
       try { document.execCommand("copy"); gotovo(); }
-      catch (e) { $("said").textContent = "Slikaj ekran i pošalji mu ❤️"; }
+      catch (e) { $("said").textContent = "Slikaj ekran i po\u0161alji mu \u2764\ufe0f"; }
       document.body.removeChild(ta);
     }
   }
