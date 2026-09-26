@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1020">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Jedno pitanje ❤️">
+<meta property="og:description" content="Otvori me.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>❤️</text></svg>">
+<title>Poziv za Mariju</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Karla:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap">
+
+<style>
+  :root {
+    --ink:      #1b1020;
+    --ink-2:    #271630;
+    --ink-3:    #34203f;
+    --paper:    #f6eae0;
+    --paper-2:  #e9d8c9;
+    --rose:     #f0455e;
+    --rose-dim: #c02f45;
+    --gold:     #f0b44c;
+    --muted:    #9c86a6;
+    --line:     rgba(246, 234, 224, 0.14);
+
+    --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+    --body:    "Karla", -apple-system, "Segoe UI", system-ui, sans-serif;
+    --mono:    "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(120% 78% at 50% 6%, #3a1f3f 0%, rgba(27, 16, 32, 0) 62%),
+      radial-gradient(90% 60% at 82% 96%, #2c1430 0%, rgba(27, 16, 32, 0) 70%),
+      var(--ink);
+    color: var(--paper);
+    font-family: var(--body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+  .stage {
+    position: relative;
+    z-index: 2;
+    min-height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 40px 20px 48px;
+  }
+
+  .scene { width: min(440px, 100%); }
+  .scene[hidden] { display: none !important; }
+
+  /* ---------- pitanje ---------- */
+
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 22px;
+  }
+
+  .ask-title {
+    margin: 0 0 14px;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(2.1rem, 8.5vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .ask-title em {
+    font-style: italic;
+    color: var(--rose);
+  }
+
+  .ask-sub {
+    margin: 0 auto 40px;
+    max-width: 30ch;
+    text-align: center;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .buttons {
+    position: relative;
+    min-height: 210px;
+    display: grid;
+    place-items: center;
+  }
+
+  .yes {
+    position: relative;
+    z-index: 2;
+    padding: 18px 46px;
+    border-radius: 100px;
+    background: linear-gradient(168deg, #ff5c74 0%, var(--rose) 48%, var(--rose-dim) 100%);
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
+      0 14px 34px rgba(240, 69, 94, 0.34),
+      0 3px 10px rgba(0, 0, 0, 0.4);
+    transform: scale(var(--grow, 1));
+    transition: transform 0.42s cubic-bezier(0.34, 1.48, 0.5, 1), box-shadow 0.42s;
+    will-change: transform;
+  }
+  .yes:active { filter: brightness(1.08); }
+
+  .maybe {
+    position: absolute;
+    z-index: 3;
+    padding: 13px 26px;
+    border-radius: 100px;
+    border: 1px solid var(--line);
+    background: rgba(246, 234, 224, 0.06);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: var(--paper);
+    font-size: 0.95rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: left 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                top 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.2s;
+  }
+
+  .counter {
+    margin-top: 26px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    min-height: 1.2em;
+    transition: opacity 0.3s;
+  }
+
+  /* ---------- planiranje ---------- */
+
+  .plan-head {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .plan-head h2 {
+    margin: 0 0 8px;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(1.7rem, 6.5vw, 2.2rem);
+    letter-spacing: -0.02em;
+  }
+  .plan-head p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+  .block { margin-bottom: 30px; }
+
+  .block > h3 {
+    margin: 0 0 13px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .cal {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px 14px 10px;
+    background: rgba(246, 234, 224, 0.035);
+  }
+  .cal-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-month {
+    font-family: var(--display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .cal-nav {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .cal-nav:disabled { opacity: 0.28; cursor: default; }
+  .cal-nav:not(:disabled):active { background: rgba(246, 234, 224, 0.1); color: var(--paper); }
+
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-dow {
+    text-align: center;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 7px;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    font-family: var(--mono);
+    font-size: 0.86rem;
+    color: var(--paper);
+    transition: background 0.14s, color 0.14s, transform 0.1s;
+  }
+  .cal-day.empty { visibility: hidden; }
+  .cal-day.past { color: rgba(156, 134, 166, 0.4); cursor: default; }
+  .cal-day:not(.past):not(.empty):active { transform: scale(0.9); }
+  .cal-day.on {
+    background: var(--rose);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 6px 16px rgba(240, 69, 94, 0.36);
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+
+  .chip {
+    padding: 11px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--line);
+    background: rgba(246, 234, 224, 0.04);
+    font-size: 0.93rem;
+    font-weight: 500;
+    color: var(--paper);
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .chip:active { transform: scale(0.96); }
+  .chip.on {
+    background: rgba(240, 69, 94, 0.18);
+    border-color: var(--rose);
+  }
+  .chip.on::before { content: "✓ "; color: var(--rose); font-weight: 700; }
+
+  /* Dvanaest termina — rešetka drži kolone poravnate umesto da se prelivaju. */
+  .chips.times {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .chips.times .chip {
+    padding: 12px 6px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+  .chips.times .chip.on::before { content: none; }
+
+  @media (max-width: 340px) {
+    .chips.times { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .confirm {
+    width: 100%;
+    margin-top: 6px;
+    padding: 18px;
+    border-radius: 16px;
+    background: linear-gradient(168deg, #ff5c74 0%, var(--rose) 48%, var(--rose-dim) 100%);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    box-shadow: 0 14px 32px rgba(240, 69, 94, 0.3);
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .confirm:active { transform: scale(0.985); }
+  .confirm:disabled {
+    background: rgba(246, 234, 224, 0.08);
+    color: var(--muted);
+    box-shadow: none;
+    cursor: default;
+  }
+
+  /* ---------- karta ---------- */
+
+  .ticket {
+    position: relative;
+    background: linear-gradient(172deg, var(--paper) 0%, var(--paper-2) 100%);
+    color: #2a1830;
+    border-radius: 20px;
+    padding: 30px 26px 26px;
+    box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55), 0 4px 14px rgba(0, 0, 0, 0.3);
+    transform: rotate(-1.1deg);
+  }
+
+  .ticket-top {
+    text-align: center;
+    padding-bottom: 22px;
+  }
+  .ticket-kicker {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--rose-dim);
+  }
+  .ticket-top h2 {
+    margin: 10px 0 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 7.5vw, 2.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #2a1830;
+  }
+
+  /* perforacija */
+  .perf {
+    position: relative;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, #2a1830 0 7px, transparent 7px 14px);
+    opacity: 0.3;
+    margin: 0 -26px;
+  }
+  .perf::before, .perf::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--ink);
+    transform: translateY(-50%);
+  }
+  .perf::before { left: -12px; }
+  .perf::after { right: -12px; }
+
+  .ticket-rows { padding-top: 22px; display: grid; gap: 16px; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .row dt {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(42, 24, 48, 0.5);
+  }
+  .row dd {
+    margin: 0;
+    font-size: 1.04rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .row dd.big {
+    font-family: var(--mono);
+    font-size: 1.28rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ticket-note {
+    margin: 24px 0 0;
+    padding-top: 18px;
+    border-top: 1px dashed rgba(42, 24, 48, 0.22);
+    font-size: 0.95rem;
+    line-height: 1.62;
+    color: rgba(42, 24, 48, 0.82);
+  }
+  .ticket-note strong { color: #2a1830; }
+
+  .ticket-stamp {
+    position: absolute;
+    right: 20px;
+    bottom: 18px;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: rgba(42, 24, 48, 0.32);
+  }
+
+  .after { margin-top: 26px; display: grid; gap: 10px; }
+
+  .send {
+    padding: 17px;
+    border-radius: 15px;
+    background: linear-gradient(168deg, #ff5c74 0%, var(--rose) 48%, var(--rose-dim) 100%);
+    color: #fff;
+    font-size: 1.02rem;
+    font-weight: 700;
+    box-shadow: 0 14px 32px rgba(240, 69, 94, 0.3);
+    transition: transform 0.1s;
+  }
+  .send:active { transform: scale(0.985); }
+
+  .again {
+    padding: 13px;
+    border-radius: 15px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .again:active { color: var(--paper); }
+
+  .said {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--muted);
+    min-height: 1.3em;
+  }
+
+  /* ---------- konfete ---------- */
+
+  #confetti {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<main class="stage">
+
+  <!-- 1. pitanje -->
+  <section class="scene" id="ask">
+    <div class="eyebrow">Jedno pitanje</div>
+    <h1 class="ask-title">Marija, hoćeš li <em>na dejt</em> sa mnom?</h1>
+    <p class="ask-sub">Bez pritiska. Ali imaj u vidu da jedno od ova dva dugmeta beži.</p>
+
+    <div class="buttons" id="buttons">
+      <button class="yes" id="yes">Da ❤️</button>
+      <button class="maybe" id="maybe">Možda 🤔</button>
+    </div>
+
+    <div class="counter" id="counter"></div>
+  </section>
+
+  <!-- 2. planiranje -->
+  <section class="scene" id="plan" hidden>
+    <div class="plan-head">
+      <h2>Znala sam ❤️</h2>
+      <p>Sad ti biraš kad i šta.</p>
+    </div>
+
+    <div class="block">
+      <h3>Koji dan</h3>
+      <div class="cal">
+        <div class="cal-bar">
+          <button class="cal-nav" id="prev" aria-label="Prethodni mesec">‹</button>
+          <div class="cal-month" id="month"></div>
+          <button class="cal-nav" id="next" aria-label="Sledeći mesec">›</button>
+        </div>
+        <div class="cal-grid" id="grid"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>U koliko sati</h3>
+      <div class="chips times" id="times"></div>
+    </div>
+
+    <div class="block">
+      <h3>Šta radimo</h3>
+      <div class="chips" id="acts"></div>
+    </div>
+
+    <button class="confirm" id="confirm" disabled>Izaberi dan i vreme</button>
+  </section>
+
+  <!-- 3. karta -->
+  <section class="scene" id="done" hidden>
+    <div class="ticket">
+      <div class="ticket-top">
+        <div class="ticket-kicker">Karta za dejt</div>
+        <h2>Dogovoreno!</h2>
+      </div>
+
+      <div class="perf"></div>
+
+      <dl class="ticket-rows">
+        <div class="row"><dt>Dan</dt><dd id="t-date"></dd></div>
+        <div class="row"><dt>Vreme</dt><dd class="big" id="t-time"></dd></div>
+        <div class="row"><dt>Plan</dt><dd id="t-plan"></dd></div>
+      </dl>
+
+      <p class="ticket-note">
+        Pokupiću te u <strong id="t-pickup"></strong>.<br>
+        Spremi se, ostalo je na meni. ❤️
+      </p>
+
+      <div class="ticket-stamp" id="t-stamp"></div>
+    </div>
+
+    <div class="after">
+      <button class="send" id="send">Pošalji Bojanu ❤️</button>
+      <button class="again" id="again">Promeni termin</button>
+    </div>
+
+    <div class="said" id="said"></div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var DANI = ["nedelja", "ponedeljak", "utorak", "sreda", "četvrtak", "petak", "subota"];
+  var DOW = ["pon", "uto", "sre", "čet", "pet", "sub", "ned"];
+  var MESECI = ["januar", "februar", "mart", "april", "maj", "jun",
+                "jul", "avgust", "septembar", "oktobar", "novembar", "decembar"];
+
+  var TERMINI = [
+    "10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
+    "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"
+  ];
+  var AKTIVNOSTI = [
+    "Doručak ☕", "Šetnja + kafa", "Ručak", "Večera",
+    "Bioskop", "Kokteli", "Mystery date 🎁", "Iznenadi me ❤️"
+  ];
+
+  /* Tekst na dugmetu se menja sa svakim klikom — poslednji ostaje. */
+  var MOZDA = [
+    "Možda 🤔", "Sigurna si? 👀", "Stvarno? 🥺", "Razmisli još 😌",
+    "Hajde, probaj da me uhvatiš 😄", "Ovo postaje smešno 🙃",
+    "Dugme je brže od tebe 🏃", "Dobro, poštujem upornost 😂"
+  ];
+
+  /* Adresa na koju odlazi njen odgovor. Prazno = ne šalje se nigde,
+     ostaje samo dugme za slanje poruke. Popunjava se posle registracije
+     na formspree.io (ili sličnom servisu) — taj link je javan po prirodi,
+     nije tajna i ne može se zloupotrebiti osim za slanje forme. */
+  var MEJL = "";
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var state = {
+    mozda: 0,
+    datum: null,
+    vreme: null,
+    plan: [],
+    mesec: new Date().getMonth(),
+    godina: new Date().getFullYear()
+  };
+
+  /* ---------- 1. pitanje ---------- */
+
+  var yes = $("yes"), maybe = $("maybe"), box = $("buttons");
+
+  function pomeriMozda() {
+    var b = box.getBoundingClientRect();
+    var m = maybe.getBoundingClientRect();
+    var maxX = Math.max(0, b.width - m.width);
+    var maxY = Math.max(0, b.height - m.height);
+    var x = Math.random() * maxX;
+    var y = Math.random() * maxY;
+
+    // Ne dozvoli da sedne tačno preko DA dugmeta.
+    var y0 = yes.offsetTop, y1 = y0 + yes.offsetHeight;
+    if (y + m.height > y0 - 8 && y < y1 + 8) {
+      y = (y < b.height / 2) ? Math.max(0, y0 - m.height - 18) : Math.min(maxY, y1 + 18);
+    }
+    maybe.style.left = Math.round(x) + "px";
+    maybe.style.top = Math.round(y) + "px";
+  }
+
+  maybe.addEventListener("click", function () {
+    state.mozda++;
+    yes.style.setProperty("--grow", Math.min(1 + state.mozda * 0.12, 2.1).toFixed(3));
+    maybe.textContent = MOZDA[Math.min(state.mozda, MOZDA.length - 1)];
+    pomeriMozda();
+    $("counter").textContent = state.mozda === 1
+      ? "„Možda”: 1 put"
+      : "„Možda”: " + state.mozda + " puta";
+    if (navigator.vibrate) { try { navigator.vibrate(8); } catch (e) {} }
+  });
+
+  yes.addEventListener("click", function () {
+    prikazi("plan");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  function prikazi(koji) {
+    ["ask", "plan", "done"].forEach(function (id) {
+      $(id).hidden = (id !== koji);
+    });
+  }
+
+  /* ---------- 2. planiranje ---------- */
+
+  function danasBezSati() {
+    var d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function crtajKalendar() {
+    var danas = danasBezSati();
+    $("month").textContent = MESECI[state.mesec] + " " + state.godina;
+
+    var prvi = new Date(state.godina, state.mesec, 1);
+    // ponedeljak kao prvi dan nedelje
+    var pomak = (prvi.getDay() + 6) % 7;
+    var brojDana = new Date(state.godina, state.mesec + 1, 0).getDate();
+
+    var html = DOW.map(function (d) {
+      return '<div class="cal-dow">' + d + "</div>";
+    }).join("");
+
+    for (var i = 0; i < pomak; i++) {
+      html += '<div class="cal-day empty"></div>';
+    }
+    for (var dan = 1; dan <= brojDana; dan++) {
+      var d = new Date(state.godina, state.mesec, dan);
+      var proslost = d < danas;
+      var izabran = state.datum && d.getTime() === state.datum.getTime();
+      html += '<button class="cal-day' + (proslost ? " past" : "") + (izabran ? " on" : "") + '"' +
+              (proslost ? " disabled" : ' data-dan="' + dan + '"') + ">" + dan + "</button>";
+    }
+    $("grid").innerHTML = html;
+
+    var prethodni = new Date(state.godina, state.mesec, 1);
+    $("prev").disabled = prethodni <= new Date(danas.getFullYear(), danas.getMonth(), 1);
+  }
+
+  $("grid").addEventListener("click", function (ev) {
+    var el = ev.target.closest("[data-dan]");
+    if (!el) return;
+    state.datum = new Date(state.godina, state.mesec, Number(el.dataset.dan));
+    crtajKalendar();
+    osveziDugme();
+  });
+
+  $("prev").addEventListener("click", function () {
+    if (--state.mesec < 0) { state.mesec = 11; state.godina--; }
+    crtajKalendar();
+  });
+  $("next").addEventListener("click", function () {
+    if (++state.mesec > 11) { state.mesec = 0; state.godina++; }
+    crtajKalendar();
+  });
+
+  $("times").innerHTML = TERMINI.map(function (t) {
+    return '<button class="chip" data-vreme="' + t + '">' + t + "</button>";
+  }).join("");
+
+  $("times").addEventListener("click", function (ev) {
+    var el = ev.target.closest("[data-vreme]");
+    if (!el) return;
+    state.vreme = el.dataset.vreme;
+    Array.prototype.forEach.call(this.children, function (c) {
+      c.classList.toggle("on", c === el);
+    });
+    osveziDugme();
+  });
+
+  $("acts").innerHTML = AKTIVNOSTI.map(function (a) {
+    return '<button class="chip" data-akt="' + a + '">' + a + "</button>";
+  }).join("");
+
+  $("acts").addEventListener("click", function (ev) {
+    var el = ev.target.closest("[data-akt]");
+    if (!el) return;
+    var a = el.dataset.akt;
+    var i = state.plan.indexOf(a);
+    if (i === -1) { state.plan.push(a); } else { state.plan.splice(i, 1); }
+    el.classList.toggle("on", i === -1);
+    osveziDugme();
+  });
+
+  function osveziDugme() {
+    var b = $("confirm");
+    var spremno = state.datum && state.vreme;
+    b.disabled = !spremno;
+    b.textContent = !state.datum ? "Izaberi dan"
+      : !state.vreme ? "Izaberi vreme"
+      : "Potvrdi naš dejt ❤️";
+  }
+
+  /* ---------- 3. karta ---------- */
+
+  function pickup(vreme) {
+    var d = vreme.split(":");
+    var m = Number(d[0]) * 60 + Number(d[1]) - 15;
+    return String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+  }
+
+  function datumTekst(d) {
+    return DANI[d.getDay()] + ", " + d.getDate() + ". " + MESECI[d.getMonth()];
+  }
+
+  function planTekst() {
+    return state.plan.length ? state.plan.join(" · ") : "Iznenađenje ❤️";
+  }
+
+  function poruka() {
+    var t = "Rekla sam DA ❤️\n\n" +
+      datumTekst(state.datum) + " u " + state.vreme + "\n" +
+      planTekst() + "\n\n" +
+      "Čekam te u " + pickup(state.vreme) + ".";
+    if (state.mozda > 0) {
+      t += "\n\n(„Možda” sam pritisnula " + state.mozda + " puta 😄)";
+    }
+    return t;
+  }
+
+  $("confirm").addEventListener("click", function () {
+    $("t-date").textContent = datumTekst(state.datum);
+    $("t-time").textContent = state.vreme;
+    $("t-plan").textContent = planTekst();
+    $("t-pickup").textContent = pickup(state.vreme);
+    $("t-stamp").textContent = "№ " + String(state.mozda).padStart(2, "0") + " · B ♥ M";
+    prikazi("done");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    konfete();
+    javiBojanu();   // ide u pozadini, ne zadržava kartu
+  });
+
+  /* Odgovor putuje sam, čim potvrdi. Ako ne prođe, ostaje dugme za poruku —
+     zato se karta prikazuje pre slanja i nikad ne čeka na mrežu. */
+  var javljeno = false;
+
+  function javiBojanu() {
+    if (!MEJL || javljeno) { return; }
+
+    var telo = {
+      odgovor: "DA ❤️",
+      dan: datumTekst(state.datum),
+      datum: state.datum.toISOString().slice(0, 10),
+      vreme: state.vreme,
+      plan: planTekst(),
+      dolazim_u: pickup(state.vreme),
+      mozda_klikova: state.mozda,
+      poslato: new Date().toLocaleString("sr-RS")
+    };
+
+    $("said").textContent = "Javljam Bojanu…";
+
+    fetch(MEJL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(telo)
+    }).then(function (r) {
+      if (!r.ok) { throw new Error("odbijeno"); }
+      javljeno = true;
+      $("said").textContent = "Bojan je obavešten ❤️";
+      $("send").textContent = "Pošalji mu i poruku";
+    }).catch(function () {
+      $("said").textContent = "Nisam uspela da mu javim — pošalji mu poruku ispod ❤️";
+    });
+  }
+
+  $("again").addEventListener("click", function () {
+    prikazi("plan");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  $("send").addEventListener("click", function () {
+    var tekst = poruka();
+    if (navigator.share) {
+      navigator.share({ text: tekst }).then(function () {
+        $("said").textContent = "Poslato ❤️";
+      }).catch(function () { kopiraj(tekst); });
+    } else {
+      kopiraj(tekst);
+    }
+  });
+
+  function kopiraj(tekst) {
+    var gotovo = function () {
+      $("said").textContent = "Prekopirano — nalepi mu u poruku ❤️";
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(tekst).then(gotovo).catch(rucno);
+    } else {
+      rucno();
+    }
+    function rucno() {
+      var ta = document.createElement("textarea");
+      ta.value = tekst;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); gotovo(); }
+      catch (e) { $("said").textContent = "Slikaj ekran i pošalji mu ❤️"; }
+      document.body.removeChild(ta);
+    }
+  }
+
+  /* ---------- konfete ---------- */
+
+  function konfete() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    var c = $("confetti");
+    var ctx = c.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = innerWidth * dpr;
+    c.height = innerHeight * dpr;
+    ctx.scale(dpr, dpr);
+
+    var boje = ["#f0455e", "#f0b44c", "#f6eae0", "#ff8fa3", "#c02f45"];
+    var delovi = [];
+    for (var i = 0; i < 110; i++) {
+      delovi.push({
+        x: innerWidth * (0.15 + Math.random() * 0.7),
+        y: -20 - Math.random() * innerHeight * 0.5,
+        w: 5 + Math.random() * 6,
+        h: 8 + Math.random() * 9,
+        vy: 1.6 + Math.random() * 2.6,
+        vx: -0.9 + Math.random() * 1.8,
+        rot: Math.random() * Math.PI,
+        vr: -0.09 + Math.random() * 0.18,
+        boja: boje[(Math.random() * boje.length) | 0]
+      });
+    }
+
+    var kraj = Date.now() + 4200;
+    (function crtaj() {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      var ziv = false;
+      for (var i = 0; i < delovi.length; i++) {
+        var p = delovi[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        if (p.y < innerHeight + 30) { ziv = true; }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.boja;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+      if (ziv && Date.now() < kraj) {
+        requestAnimationFrame(crtaj);
+      } else {
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+      }
+    })();
+  }
+
+  /* ---------- pokretanje ---------- */
+
+  crtajKalendar();
+  osveziDugme();
+  requestAnimationFrame(pomeriMozda);
+  window.addEventListener("resize", pomeriMozda);
+})();
+</script>
+</body>
+</html>
