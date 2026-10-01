@@ -12,8 +12,30 @@ bez servera. Jedan fajl: `index.html`.
 3. **Karta** — perforisana ulaznica sa danom, vremenom i planom. Vreme dolaska
    se računa samo, petnaest minuta pre termina. Uz konfete.
 
+Uz to, na prvom ekranu lebde **tri poklončića**. Otvara se samo jedan — ostali
+nestanu, a telefon zapamti da je iskorišćen. Poklon vodi na zasebnu karticu sa
+nagradom, mestom i terminom koje si ti unapred odredio.
+
 Odgovor se šalje na mejl automatski, čim pritisne *Potvrdi*. Dugme
 *Pošalji Bojanu* ostaje kao rezerva ako slanje ne prođe.
+
+## Podešavanje poklona
+
+U `index.html`, pri vrhu skripte:
+
+```js
+var POKLON = {
+  VERZIJA: "1",          // promeni da se poklončići vrate svima
+  nagrada: "BATTLESHIP",
+  tajna:   "Ne pitaj šta je. Niko ti neće reći.",
+  mesto:   "Kod mene",
+  kad:     "subota u 19:00",
+  dole:    "Dođi gladna i spremna da gubiš. ❤️"
+};
+```
+
+Telefon pamti da je poklon otvoren, i to pamćenje je vezano za `VERZIJA`.
+Dovoljno je promeniti tu oznaku i objaviti — poklončići se vraćaju.
 
 ## Podešavanje mejla
 

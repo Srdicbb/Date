@@ -77,11 +77,12 @@
     margin: 0 0 14px;
     font-family: var(--display);
     font-weight: 600;
-    font-size: clamp(2.1rem, 8.5vw, 3rem);
-    line-height: 1.08;
+    font-size: clamp(1.7rem, 7.2vw, 2.7rem);
+    line-height: 1.1;
     letter-spacing: -0.025em;
     text-align: center;
     text-wrap: balance;
+    overflow-wrap: break-word;
   }
   .ask-title em {
     font-style: italic;
@@ -452,6 +453,118 @@
   }
 
   :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+  /* ---------- poklončići ---------- */
+
+  .pokloni { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
+  .pokloni[hidden] { display: none !important; }
+
+  .poklon {
+    position: absolute;
+    width: 62px;
+    height: 62px;
+    pointer-events: auto;
+    animation: lebdi 4.5s ease-in-out infinite;
+    transition: transform 0.4s cubic-bezier(0.34, 1.5, 0.5, 1), opacity 0.4s;
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.5));
+  }
+  .poklon:nth-child(2) { animation-delay: -1.5s; }
+  .poklon:nth-child(3) { animation-delay: -3s; }
+  .poklon:active { transform: scale(0.88); }
+  .poklon svg { width: 100%; height: 100%; display: block; }
+
+  /* onaj koji nije izabran nestaje */
+  .poklon.nestaje { opacity: 0; transform: scale(0.6); pointer-events: none; }
+  /* izabrani poskoči pre nego što se pređe dalje */
+  .poklon.otvara { animation: none; transform: scale(1.5) rotate(-8deg); opacity: 0; }
+
+  @keyframes lebdi {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50%      { transform: translateY(-11px) rotate(4deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .poklon { animation: none; }
+  }
+
+  .vec-otvoren {
+    margin-top: 18px;
+    text-align: center;
+  }
+  .vec-otvoren button {
+    font-size: 0.86rem;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(240, 180, 76, 0.4);
+    padding-bottom: 2px;
+  }
+
+  /* ---------- poklon: nagrada ---------- */
+
+  .nagrada {
+    position: relative;
+    background: linear-gradient(168deg, #2a1636 0%, #1d1026 100%);
+    border: 1px solid rgba(240, 180, 76, 0.34);
+    border-radius: 22px;
+    padding: 34px 26px 28px;
+    text-align: center;
+    box-shadow: 0 26px 60px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+  }
+  .nagrada::before {
+    content: "";
+    position: absolute;
+    inset: -40% -10% auto -10%;
+    height: 70%;
+    background: radial-gradient(60% 100% at 50% 100%, rgba(240, 180, 76, 0.22), transparent 70%);
+    pointer-events: none;
+  }
+
+  .nagrada-kicker {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .nagrada-ime {
+    position: relative;
+    margin: 14px 0 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2.1rem, 9vw, 2.9rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--paper);
+  }
+  .nagrada-tajna {
+    position: relative;
+    margin: 12px auto 0;
+    max-width: 26ch;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .kada-gde {
+    display: grid;
+    gap: 14px;
+    margin-top: 26px;
+    padding-top: 24px;
+    border-top: 1px dashed rgba(246, 234, 224, 0.2);
+    text-align: left;
+  }
+  .kada-gde .row { grid-template-columns: 70px 1fr; }
+  .kada-gde dt { color: rgba(240, 180, 76, 0.75); }
+  .kada-gde dd { color: var(--paper); }
+
+  .nagrada-dole {
+    margin: 24px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--muted);
+  }
 </style>
 </head>
 <body>
@@ -471,7 +584,19 @@
     </div>
 
     <div class="counter" id="counter"></div>
+
+    <div class="vec-otvoren" id="vec-otvoren" hidden>
+      <button type="button" id="vidi-poklon">Pogledaj svoj poklon ❤️</button>
+    </div>
   </section>
+
+
+  <!-- poklončići lebde preko pitanja -->
+  <div class="pokloni" id="pokloni">
+    <button class="poklon" type="button" data-poklon="1" aria-label="Otvori poklon"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="26" width="48" height="30" rx="4" fill="#f6eae0"/><rect x="5" y="19" width="54" height="11" rx="3.5" fill="#fbf3ea"/><rect x="27" y="19" width="10" height="37" fill="#f0455e"/><path d="M32 19c-6-2-13-3-13-8 0-3 3-5 6-4 4 1 6 6 7 12z" fill="#f0b44c"/><path d="M32 19c6-2 13-3 13-8 0-3-3-5-6-4-4 1-6 6-7 12z" fill="#f0b44c"/><circle cx="32" cy="17" r="3.4" fill="#f0455e"/></svg></button>
+    <button class="poklon" type="button" data-poklon="2" aria-label="Otvori poklon"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="26" width="48" height="30" rx="4" fill="#f6eae0"/><rect x="5" y="19" width="54" height="11" rx="3.5" fill="#fbf3ea"/><rect x="27" y="19" width="10" height="37" fill="#f0455e"/><path d="M32 19c-6-2-13-3-13-8 0-3 3-5 6-4 4 1 6 6 7 12z" fill="#f0b44c"/><path d="M32 19c6-2 13-3 13-8 0-3-3-5-6-4-4 1-6 6-7 12z" fill="#f0b44c"/><circle cx="32" cy="17" r="3.4" fill="#f0455e"/></svg></button>
+    <button class="poklon" type="button" data-poklon="3" aria-label="Otvori poklon"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="26" width="48" height="30" rx="4" fill="#f6eae0"/><rect x="5" y="19" width="54" height="11" rx="3.5" fill="#fbf3ea"/><rect x="27" y="19" width="10" height="37" fill="#f0455e"/><path d="M32 19c-6-2-13-3-13-8 0-3 3-5 6-4 4 1 6 6 7 12z" fill="#f0b44c"/><path d="M32 19c6-2 13-3 13-8 0-3-3-5-6-4-4 1-6 6-7 12z" fill="#f0b44c"/><circle cx="32" cy="17" r="3.4" fill="#f0455e"/></svg></button>
+  </div>
 
   <!-- 2. planiranje -->
   <section class="scene" id="plan" hidden>
@@ -503,6 +628,29 @@
     </div>
 
     <button class="confirm" id="confirm" disabled>Izaberi dan i vreme</button>
+  </section>
+
+  <!-- poklon -->
+  <section class="scene" id="gift" hidden>
+    <div class="nagrada">
+      <div class="nagrada-kicker">Otvorila si poklon</div>
+      <h2 class="nagrada-ime" id="g-ime"></h2>
+      <p class="nagrada-tajna" id="g-tajna"></p>
+
+      <dl class="kada-gde">
+        <div class="row"><dt>Gde</dt><dd id="g-mesto"></dd></div>
+        <div class="row"><dt>Kad</dt><dd id="g-kad"></dd></div>
+      </dl>
+
+      <p class="nagrada-dole" id="g-dole"></p>
+    </div>
+
+    <div class="after">
+      <button class="send" id="g-send">Sačuvaj poklon ❤️</button>
+      <button class="again" id="g-nazad">Nazad</button>
+    </div>
+
+    <div class="said" id="g-said"></div>
   </section>
 
   <!-- 3. karta -->
@@ -570,6 +718,18 @@
      nije tajna i ne može se zloupotrebiti osim za slanje forme. */
   var MEJL = "";
 
+  /* ---------- poklon ----------
+     Promeni VERZIJA pri novom objavljivanju da se poklončići vrate —
+     telefon pamti da su otvoreni, a pamćenje je vezano za ovu oznaku. */
+  var POKLON = {
+    VERZIJA: "1",
+    nagrada: "BATTLESHIP",
+    tajna: "Ne pitaj šta je. Niko ti neće reći.",
+    mesto: "Kod mene",
+    kad: "subota u 19:00",
+    dole: "Dođi gladna i spremna da gubiš. ❤️"
+  };
+
   var $ = function (id) { return document.getElementById(id); };
 
   var state = {
@@ -626,11 +786,12 @@
   });
 
   function prikazi(koji) {
-    ["ask", "plan", "done"].forEach(function (id) {
+    ["ask", "plan", "done", "gift"].forEach(function (id) {
       $(id).hidden = (id !== koji);
     });
-    // Lebdi preko celog ekrana, pa mora da nestane čim se ode dalje.
+    // Oboje lebdi preko celog ekrana, pa mora da nestane čim se ode dalje.
     maybe.hidden = (koji !== "ask");
+    $("pokloni").hidden = (koji !== "ask") || otvoren();
   }
 
   /* Na početku stoji pristojno ispod „Da", da se vide kao par — tek posle beži. */
@@ -1003,6 +1164,197 @@
     }
   }
 
+  /* ---------- poklončići ---------- */
+
+  var KLJUC = "poklon-otvoren-v" + POKLON.VERZIJA;
+
+  function otvoren() {
+    try { return !!localStorage.getItem(KLJUC); } catch (e) { return false; }
+  }
+
+  function zapamti() {
+    try { localStorage.setItem(KLJUC, new Date().toISOString()); } catch (e) {}
+  }
+
+  /* Razbacani po ivicama, podalje od pitanja i dugmadi u sredini.
+     Računamo u pikselima iz stvarne širine ekrana i držimo ih unutar njega —
+     procenti su se znali iscrtati izvan vidljivog dela. */
+  var MESTA = [
+    { x: 0.07, y: 0.11 },
+    { x: 0.74, y: 0.20 },
+    { x: 0.63, y: 0.845 }
+  ];
+
+  function rasporedi() {
+    var kutije = document.querySelectorAll(".poklon");
+    var IVICA = 12;
+    Array.prototype.forEach.call(kutije, function (el, n) {
+      var m = MESTA[n] || MESTA[0];
+      var w = el.offsetWidth || 62;
+      var h = el.offsetHeight || 62;
+      var x = Math.min(Math.max(IVICA, m.x * innerWidth), innerWidth - w - IVICA);
+      var y = Math.min(Math.max(IVICA, m.y * innerHeight), innerHeight - h - IVICA);
+      el.style.left = Math.round(x) + "px";
+      el.style.top = Math.round(y) + "px";
+      el.style.right = "auto";
+      el.style.bottom = "auto";
+    });
+  }
+
+  function popuniPoklon() {
+    $("g-ime").textContent = POKLON.nagrada;
+    $("g-tajna").textContent = POKLON.tajna;
+    $("g-mesto").textContent = POKLON.mesto;
+    $("g-kad").textContent = POKLON.kad;
+    $("g-dole").textContent = POKLON.dole;
+  }
+
+  $("pokloni").addEventListener("click", function (ev) {
+    var el = ev.target.closest("[data-poklon]");
+    if (!el || otvoren()) { return; }
+
+    // Izabrani poskoči, ostali nestanu — poklon se otvara samo jednom.
+    Array.prototype.forEach.call(this.querySelectorAll(".poklon"), function (k) {
+      k.classList.add(k === el ? "otvara" : "nestaje");
+    });
+    zapamti();
+    if (navigator.vibrate) { try { navigator.vibrate([12, 40, 18]); } catch (e) {} }
+
+    setTimeout(function () {
+      popuniPoklon();
+      prikazi("gift");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      konfete();
+      $("vec-otvoren").hidden = false;
+    }, 420);
+  });
+
+  $("vidi-poklon").addEventListener("click", function () {
+    popuniPoklon();
+    prikazi("gift");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  $("g-nazad").addEventListener("click", function () {
+    prikazi("ask");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  /* ---------- poklon kao slika ---------- */
+
+  function nacrtajPoklon() {
+    var W = 1080, H = 1240, R = 44;
+    var c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    var x = c.getContext("2d");
+
+    var poz = x.createLinearGradient(0, 0, W, H);
+    poz.addColorStop(0, "#2d1836");
+    poz.addColorStop(0.55, "#1b1020");
+    poz.addColorStop(1, "#2a1430");
+    x.fillStyle = poz;
+    x.fillRect(0, 0, W, H);
+
+    var kx = 84, ky = 120, kw = W - kx * 2, kh = H - ky * 2;
+    var kart = x.createLinearGradient(0, ky, 0, ky + kh);
+    kart.addColorStop(0, "#2a1636");
+    kart.addColorStop(1, "#1d1026");
+    x.save();
+    x.shadowColor = "rgba(0,0,0,0.6)";
+    x.shadowBlur = 60;
+    x.shadowOffsetY = 26;
+    zaobljen(x, kx, ky, kw, kh, R);
+    x.fillStyle = kart;
+    x.fill();
+    x.restore();
+    zaobljen(x, kx, ky, kw, kh, R);
+    x.strokeStyle = "rgba(240,180,76,0.34)";
+    x.lineWidth = 3;
+    x.stroke();
+
+    var sx = kx + 72;
+    var sirina = kw - 144;
+
+    x.textAlign = "center";
+    x.fillStyle = "#f0b44c";
+    x.font = "700 26px 'Space Mono', monospace";
+    x.fillText(razmaknuto("OTVORILA SI POKLON"), kx + kw / 2, ky + 100);
+
+    x.fillStyle = "#f6eae0";
+    x.font = "700 96px Fraunces, Georgia, serif";
+    x.fillText(POKLON.nagrada, kx + kw / 2, ky + 212);
+
+    x.fillStyle = "#9c86a6";
+    x.font = "italic 400 34px Karla, sans-serif";
+    var y = redovi(x, POKLON.tajna, kx + kw / 2, ky + 276, sirina - 60, 48);
+
+    y += 40;
+    x.strokeStyle = "rgba(246,234,224,0.2)";
+    x.lineWidth = 2;
+    x.setLineDash([8, 8]);
+    x.beginPath();
+    x.moveTo(sx, y);
+    x.lineTo(sx + sirina, y);
+    x.stroke();
+    x.setLineDash([]);
+
+    x.textAlign = "left";
+    y += 90;
+    y = poljeTamno(x, "GDE", POKLON.mesto, sx, y, sirina);
+    y = poljeTamno(x, "KAD", POKLON.kad, sx, y, sirina);
+
+    y += 30;
+    x.fillStyle = "#9c86a6";
+    x.font = "400 34px Karla, sans-serif";
+    redovi(x, POKLON.dole, sx, y, sirina, 50);
+
+    return c;
+  }
+
+  function poljeTamno(x, naslov, vrednost, sx, y, sirina) {
+    x.fillStyle = "rgba(240,180,76,0.75)";
+    x.font = "700 24px 'Space Mono', monospace";
+    x.fillText(razmaknuto(naslov), sx, y);
+    x.fillStyle = "#f6eae0";
+    x.font = "700 46px Karla, sans-serif";
+    return redovi(x, vrednost, sx, y + 60, sirina, 56) + 40;
+  }
+
+  $("g-send").addEventListener("click", function () {
+    $("g-said").textContent = "Pravim sliku\u2026";
+    var kreni = function () {
+      nacrtajPoklon().toBlob(function (blob) {
+        if (!blob) { return; }
+        var ime = "poklon.png";
+        var fajl = new File([blob], ime, { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [fajl] })) {
+          navigator.share({ files: [fajl] })
+            .then(function () { $("g-said").textContent = "Sa\u010duvano \u2764\ufe0f"; })
+            .catch(function (e) {
+              if (e && e.name === "AbortError") { $("g-said").textContent = ""; }
+              else { skiniPoklon(blob, ime); }
+            });
+        } else {
+          skiniPoklon(blob, ime);
+        }
+      }, "image/png");
+    };
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(kreni).catch(kreni);
+    } else { kreni(); }
+  });
+
+  function skiniPoklon(blob, ime) {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = ime;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    $("g-said").textContent = "Slika je sa\u010duvana \u2764\ufe0f";
+  }
+
   /* ---------- konfete ---------- */
 
   function konfete() {
@@ -1060,10 +1412,16 @@
 
   crtajKalendar();
   osveziDugme();
+  rasporedi();
+  if (otvoren()) {
+    $("pokloni").hidden = true;
+    $("vec-otvoren").hidden = false;
+  }
   requestAnimationFrame(pocetnoMesto);
   // Dok još nije bežalo, drži ga uz „Da"; kad pobegne, samo ga vrati u vidno polje.
   window.addEventListener("resize", function () {
     if (state.mozda === 0) { pocetnoMesto(); } else { pomeriMozda(); }
+    rasporedi();
   });
 })();
 </script>
