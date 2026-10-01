@@ -455,6 +455,51 @@
   :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 
+
+  /* ---------- promašaj ---------- */
+
+  .promasaj {
+    text-align: center;
+    padding: 46px 26px 40px;
+    border-radius: 22px;
+    border: 1px solid rgba(246, 234, 224, 0.14);
+    background: linear-gradient(168deg, #241733 0%, #191022 100%);
+    box-shadow: 0 26px 60px rgba(0, 0, 0, 0.55);
+  }
+  .promasaj-lice {
+    font-size: 4rem;
+    line-height: 1;
+    display: block;
+    margin-bottom: 20px;
+    animation: tone 3.4s ease-in-out infinite;
+  }
+  .promasaj h2 {
+    margin: 0 0 12px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 8vw, 2.5rem);
+    letter-spacing: -0.03em;
+    color: var(--paper);
+  }
+  .promasaj p {
+    margin: 0 auto;
+    max-width: 24ch;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.6;
+  }
+  .promasaj strong { color: var(--gold); font-weight: 700; }
+
+  @keyframes tone {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50%      { transform: translateY(5px) rotate(3deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .promasaj-lice { animation: none; }
+  }
+
+  .poklon.potopljen { opacity: 0; transform: scale(0.5) rotate(14deg); pointer-events: none; }
+
   /* ---------- obaveštenje o poklonu ---------- */
 
   .ima-poklon {
@@ -767,6 +812,19 @@
     <button class="confirm" id="confirm" disabled>Izaberi dan i vreme</button>
   </section>
 
+  <!-- promašaj -->
+  <section class="scene" id="miss" hidden>
+    <div class="promasaj">
+      <span class="promasaj-lice">😔</span>
+      <h2>Promašaj</h2>
+      <p>Taj je bio prazan. Imaš <strong>još jednu šansu</strong> — biraj pažljivo.</p>
+    </div>
+
+    <div class="after">
+      <button class="send" id="m-opet">Probaj ponovo</button>
+    </div>
+  </section>
+
   <!-- poklon -->
   <section class="scene" id="gift" hidden>
     <div class="nagrada">
@@ -923,7 +981,7 @@
   });
 
   function prikazi(koji) {
-    ["ask", "plan", "done", "gift"].forEach(function (id) {
+    ["ask", "plan", "done", "gift", "miss"].forEach(function (id) {
       $(id).hidden = (id !== koji);
     });
     // Oboje lebdi preko celog ekrana, pa mora da nestane čim se ode dalje.
@@ -1346,12 +1404,29 @@
     $("g-dole").textContent = POKLON.dole;
   }
 
+  /* Prvi dodir je uvek promašaj, drugi uvek pogodak — mali trenutak
+     neizvesnosti, ali bez rizika da ostane praznih ruku. */
+  var pokusaj = 0;
+
   $("pokloni").addEventListener("click", function (ev) {
     var el = ev.target.closest("[data-poklon]");
-    if (!el || otvoren()) { return; }
+    if (!el || otvoren() || el.classList.contains("potopljen")) { return; }
 
-    // Izabrani poskoči, ostali nestanu — poklon se otvara samo jednom.
+    pokusaj++;
+
+    if (pokusaj === 1) {
+      el.classList.add("potopljen");
+      if (navigator.vibrate) { try { navigator.vibrate([30, 60, 30]); } catch (e) {} }
+      setTimeout(function () {
+        prikazi("miss");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 380);
+      return;
+    }
+
+    // Izabrani poskoči, preostali nestanu — poklon se otvara samo jednom.
     Array.prototype.forEach.call(this.querySelectorAll(".poklon"), function (k) {
+      if (k.classList.contains("potopljen")) { return; }
       k.classList.add(k === el ? "otvara" : "nestaje");
     });
     zapamti();
@@ -1365,6 +1440,13 @@
       $("ima-poklon").hidden = true;
       $("vec-otvoren").hidden = false;
     }, 420);
+  });
+
+  $("m-opet").addEventListener("click", function () {
+    prikazi("ask");
+    $("ima-poklon").innerHTML = $("ima-poklon").innerHTML
+      .replace("Imaš poklon — pronađi ga", "Još jedna šansa — biraj");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
   $("vidi-poklon").addEventListener("click", function () {
